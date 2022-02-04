@@ -1,0 +1,16 @@
+{
+    "scripts": {
+        "test": "jest --verbose"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.1067.0",
+        "serverless-jest-plugin": "^0.4.0",
+        "uuid": "^8.3.2"
+    },
+    "devDependencies": {
+        "@shelf/jest-dynamodb": "^1.7.0",
+        "jest": "^27.4.7",
+        "serverless-dynamodb-local": "0.2.37",
+        "serverless-offline": "^8.4.0"
+    }
+}

@@ -1,0 +1,84 @@
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+service: hola-mundo
+frameworkVersion: "3"
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  region: us-east-2
+  stage: dev
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource:
+        - arn:aws:dynamodb:us-east-2:170264614590:table/TaskTable
+
+functions:
+  status:
+    handler: src/endpoints/status.handler
+    events:
+      - httpApi:
+          method: get
+          path: /status
+  getTasks:
+    handler: src/endpoints/getTasks.handler
+    events:
+      - httpApi:
+          method: get
+          path: /tasks
+  getTask:
+    handler: src/endpoints/getTask.handler
+    events:
+      - httpApi:
+          method: get
+          path: /tasks/{id}
+  createTask:
+    handler: src/endpoints/createTask.handler
+    events:
+      - httpApi:
+          method: post
+          path: /tasks
+  updateTask:
+    handler: src/endpoints/updateTask.handler
+    events:
+      - httpApi:
+          method: put
+          path: /tasks/{id}
+  deleteTask:
+    handler: src/endpoints/deleteTask.handler
+    events:
+      - httpApi:
+          method: delete
+          path: /tasks/{id}
+
+resources:
+  Resources:
+    TaskTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: TaskTable
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  dynamodb:
+    stages:
+      - dev
+    start:
+      port: 8000
+      migrate: true
+      inMemory: true
+    migration:
+      dir: offline/migrations
