@@ -43,7 +43,7 @@ npm run test
 sls deploy --verbose
 ```
 
-## Eliminar proyecto de AWS
+## Delete AWS CloudFormation project
 
 - If you want to remove the CloudFormation project from AWS:
 
