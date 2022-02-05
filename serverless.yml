@@ -69,10 +69,19 @@ resources:
             KeyType: HASH
 
 plugins:
+  - serverless-webpack
   - serverless-dynamodb-local
   - serverless-offline
 
+package:
+  individually: true
+
 custom:
+  webpack:
+    webpackConfig: "webpack.config.js"
+    includeModules: false
+    packager: "npm"
+    excludeFiles: src/**/*.test.js
   dynamodb:
     stages:
       - dev

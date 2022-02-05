@@ -40,7 +40,7 @@ npm run test
 ## Deploy to AWS
 
 ```
-sls deploy --verbose
+npm run deploy
 ```
 
 ## Delete AWS CloudFormation project
