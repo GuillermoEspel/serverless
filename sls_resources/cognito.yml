@@ -33,4 +33,4 @@ ApiGatewayAuthorizer:
     RestApiId:
       Ref: ApiGatewayRestApi
     ProviderARNs:
-      - { Ref: CognitoUserPool }
+      - { Fn::GetAtt: [CognitoUserPool, Arn] }

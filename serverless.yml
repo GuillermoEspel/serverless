@@ -19,8 +19,7 @@ provider:
     - Effect: Allow
       Action:
         - dynamodb:*
-      Resource:
-        - arn:aws:dynamodb:us-east-2:170264614590:table/TaskTable
+      Resource: { Fn::GetAtt: [TaskTable, Arn] }
     - Effect: Allow
       Action:
         - cognito-idp:AdminInitiateAuth
@@ -53,7 +52,7 @@ functions:
           authorizer:
             name: PrivateAuthorizer
             type: COGNITO_USER_POOLS
-            authorizerId: { Ref: ApiGatewayAuthorizer }
+            arn: { Fn::GetAtt: [CognitoUserPool, Arn] }
             claims:
               - email
 
