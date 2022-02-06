@@ -96,53 +96,10 @@ functions:
 
 resources:
   Resources:
-    TaskTable:
-      Type: AWS::DynamoDB::Table
-      Properties:
-        TableName: ${self:provider.environment.TASK_TABLE}
-        BillingMode: PAY_PER_REQUEST
-        AttributeDefinitions:
-          - AttributeName: id
-            AttributeType: S
-        KeySchema:
-          - AttributeName: id
-            KeyType: HASH
-    CognitoUserPool:
-      Type: AWS::Cognito::UserPool
-      Properties:
-        UserPoolName: my-user-pool
-        Schema:
-          - Name: email
-            Required: true
-            Mutable: true
-        Policies:
-          PasswordPolicy:
-            MinimumLength: 6
-            RequireLowercase: False
-            RequireNumbers: True
-            RequireSymbols: False
-            RequireUppercase: True
-        AutoVerifiedAttributes: ["email"]
-    CognitoUserPoolClient:
-      Type: AWS::Cognito::UserPoolClient
-      Properties:
-        ClientName: my-user-pool-client
-        GenerateSecret: false
-        UserPoolId: { Ref: CognitoUserPool }
-        AccessTokenValidity: 5
-        IdTokenValidity: 5
-        ExplicitAuthFlows:
-          - "ADMIN_NO_SRP_AUTH"
-    ApiGatewayAuthorizer:
-      Type: AWS::ApiGateway::Authorizer
-      Properties:
-        Name: CognitoUserPool
-        Type: COGNITO_USER_POOLS
-        IdentitySource: method.request.header.Authorization
-        RestApiId:
-          Ref: ApiGatewayRestApi
-        ProviderARNs:
-          - { Ref: CognitoUserPool }
+    TaskTable: ${file(sls_resources/dynamodb_tables.yml):TaskTable}
+    CognitoUserPool: ${file(sls_resources/cognito.yml):CognitoUserPool}
+    CognitoUserPoolClient: ${file(sls_resources/cognito.yml):CognitoUserPoolClient}
+    ApiGatewayAuthorizer: ${file(sls_resources/cognito.yml):ApiGatewayAuthorizer}
 
 plugins:
   - serverless-webpack
