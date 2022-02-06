@@ -6,49 +6,88 @@ frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs14.x
   region: us-east-2
   stage: dev
+  environment:
+    DYNAMODB: { Ref: TaskTable }
+    USER_POOL_ID: { Ref: CognitoUserPool }
+    CLIENT_ID: { Ref: CognitoUserPoolClient }
+    APIGATEWAY: { Ref: ApiGatewayAuthorizer }
   iamRoleStatements:
     - Effect: Allow
       Action:
         - dynamodb:*
       Resource:
         - arn:aws:dynamodb:us-east-2:170264614590:table/TaskTable
+    - Effect: Allow
+      Action:
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+      Resource: { Fn::GetAtt: [CognitoUserPool, Arn] }
 
 functions:
+  signupUser:
+    handler: ${self:custom.folderEndpoints}/signup.handler
+    events:
+      - http:
+          path: user/signup
+          method: post
+          cors: true
+  loginUser:
+    handler: ${self:custom.folderEndpoints}/login.handler
+    events:
+      - http:
+          path: user/login
+          method: post
+          cors: true
+  privateAPI:
+    handler: ${self:custom.folderEndpoints}/private.handler
+    events:
+      - http:
+          path: user/private
+          method: post
+          cors: true
+          authorizer:
+            name: PrivateAuthorizer
+            type: COGNITO_USER_POOLS
+            authorizerId: { Ref: ApiGatewayAuthorizer }
+            claims:
+              - email
+
   status:
-    handler: src/endpoints/status.handler
+    handler: ${self:custom.folderEndpoints}/status.handler
     events:
       - httpApi:
           method: get
           path: /status
   getTasks:
-    handler: src/endpoints/getTasks.handler
+    handler: ${self:custom.folderEndpoints}/getTasks.handler
     events:
       - httpApi:
           method: get
           path: /tasks
   getTask:
-    handler: src/endpoints/getTask.handler
+    handler: ${self:custom.folderEndpoints}/getTask.handler
     events:
       - httpApi:
           method: get
           path: /tasks/{id}
   createTask:
-    handler: src/endpoints/createTask.handler
+    handler: ${self:custom.folderEndpoints}/createTask.handler
     events:
       - httpApi:
           method: post
           path: /tasks
   updateTask:
-    handler: src/endpoints/updateTask.handler
+    handler: ${self:custom.folderEndpoints}/updateTask.handler
     events:
       - httpApi:
           method: put
           path: /tasks/{id}
   deleteTask:
-    handler: src/endpoints/deleteTask.handler
+    handler: ${self:custom.folderEndpoints}/deleteTask.handler
     events:
       - httpApi:
           method: delete
@@ -59,7 +98,7 @@ resources:
     TaskTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: TaskTable
+        TableName: ${self:custom.tablename}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id
@@ -67,9 +106,46 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
+    CognitoUserPool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: my-user-pool
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+            RequireLowercase: False
+            RequireNumbers: True
+            RequireSymbols: False
+            RequireUppercase: True
+        AutoVerifiedAttributes: ["email"]
+    CognitoUserPoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: my-user-pool-client
+        GenerateSecret: false
+        UserPoolId: { Ref: CognitoUserPool }
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - "ADMIN_NO_SRP_AUTH"
+    ApiGatewayAuthorizer:
+      Type: AWS::ApiGateway::Authorizer
+      Properties:
+        Name: CognitoUserPool
+        Type: COGNITO_USER_POOLS
+        IdentitySource: method.request.header.Authorization
+        RestApiId:
+          Ref: ApiGatewayRestApi
+        ProviderARNs:
+          - { Ref: CognitoUserPool }
 
 plugins:
   - serverless-webpack
+  - serverless-export-env
   - serverless-dynamodb-local
   - serverless-offline
 
@@ -91,3 +167,5 @@ custom:
       inMemory: true
     migration:
       dir: offline/migrations
+  tablename: "TaskTable"
+  folderEndpoints: "src/endpoints"

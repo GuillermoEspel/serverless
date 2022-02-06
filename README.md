@@ -50,3 +50,17 @@ npm run deploy
 ```
 sls remove
 ```
+
+## Configure AWS Cognito
+
+- Deploy configuration:
+
+```
+npm run deploy
+```
+
+- Enter the Cognito dashboard.
+- Select the User Pool generated in the deployment.
+- Select "App client settings", enable "Cognito User Pool" as provider and enter the callback and sign out URLs.
+- Select "Implicit grant" from Allowed OAuth Flows.
+- Select all checks for Allowed OAuth Scopes.
