@@ -6,6 +6,7 @@
 - AWS SDK
 - AWS Lambda
 - AWS DynamoDB
+- AWS Cognito
 - NodeJS
 - Jest
 
