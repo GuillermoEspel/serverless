@@ -10,6 +10,7 @@ provider:
   region: us-east-2
   stage: dev
   environment:
+    TASK_TABLE: "TaskTable"
     DYNAMODB: { Ref: TaskTable }
     USER_POOL_ID: { Ref: CognitoUserPool }
     CLIENT_ID: { Ref: CognitoUserPoolClient }
@@ -98,7 +99,7 @@ resources:
     TaskTable:
       Type: AWS::DynamoDB::Table
       Properties:
-        TableName: ${self:custom.tablename}
+        TableName: ${self:provider.environment.TASK_TABLE}
         BillingMode: PAY_PER_REQUEST
         AttributeDefinitions:
           - AttributeName: id
@@ -167,5 +168,4 @@ custom:
       inMemory: true
     migration:
       dir: offline/migrations
-  tablename: "TaskTable"
   folderEndpoints: "src/endpoints"

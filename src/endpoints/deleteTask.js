@@ -1,12 +1,8 @@
+const Responses = require("../common/Responses");
 const Dynamo = require("../common/Dynamo");
 
 module.exports.handler = async (event) => {
   const { id } = event.pathParameters;
-  const data = await Dynamo.deleteItem("TaskTable", id);
-
-  // Define result
-  const result = {};
-  result.statusCode = 200;
-  result.body = JSON.stringify(data);
-  return result;
+  const data = await Dynamo.deleteItem(process.env.TASK_TABLE, id);
+  return Responses._200(data);
 };

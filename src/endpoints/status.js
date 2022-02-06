@@ -1,7 +1,5 @@
+const Responses = require("../common/Responses");
+
 module.exports.handler = async (event) => {
-  const bodyResult = { message: "OK" };
-  return {
-    statusCode: 200,
-    body: JSON.stringify(bodyResult, null, 2),
-  };
+  return Responses._200({ message: "OK" });
 };
