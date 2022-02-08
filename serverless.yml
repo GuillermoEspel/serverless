@@ -32,6 +32,10 @@ provider:
       Action:
         - s3:*
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - rekognition:DetectText
+      Resource: "*"
 
 functions:
   status: ${file(sls_functions/status.yml):status}
@@ -50,6 +54,7 @@ functions:
           path: files
           method: post
           cors: true
+  getTextFromImageBase64: ${file(sls_functions/rekoginition.yml):getTextFromImageBase64}
 
 resources:
   Resources:

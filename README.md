@@ -8,6 +8,7 @@
 - AWS DynamoDB
 - AWS Cognito
 - AWS S3
+- AWS Rekognition
 - NodeJS
 - Jest
 

@@ -1,0 +1,7 @@
+getTextFromImageBase64:
+  handler: ${self:custom.folderEndpoints}/getTextFromImage.handler
+  events:
+    - http:
+        path: getText
+        method: post
+        cors: true
