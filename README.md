@@ -51,7 +51,7 @@ npm run deploy
 - If you want to remove the CloudFormation project from AWS:
 
 ```
-sls remove
+npm run remove
 ```
 
 ## Configure AWS Cognito

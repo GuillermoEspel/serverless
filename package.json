@@ -4,6 +4,7 @@
     "scripts": {
         "env": "rm -r .env && sls export-env",
         "deploy": "serverless deploy --verbose",
+        "remove": "serverless remove",
         "test": "jest --verbose --detectOpenHandles"
     },
     "dependencies": {
