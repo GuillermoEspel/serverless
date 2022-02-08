@@ -10,7 +10,9 @@ provider:
   region: us-east-2
   stage: dev
   environment:
+    REGION: ${self:provider.region}
     TASK_TABLE: "TaskTable"
+    BUCKET_NAME: "bucket-example-1d81aa02-933f"
     DYNAMODB: { Ref: TaskTable }
     USER_POOL_ID: { Ref: CognitoUserPool }
     CLIENT_ID: { Ref: CognitoUserPoolClient }
@@ -26,72 +28,28 @@ provider:
         - cognito-idp:AdminCreateUser
         - cognito-idp:AdminSetUserPassword
       Resource: { Fn::GetAtt: [CognitoUserPool, Arn] }
+    - Effect: Allow
+      Action:
+        - s3:*
+      Resource: "*"
 
 functions:
-  signupUser:
-    handler: ${self:custom.folderEndpoints}/signup.handler
+  status: ${file(sls_functions/status.yml):status}
+  getTasks: ${file(sls_functions/tasks.yml):getTasks}
+  getTask: ${file(sls_functions/tasks.yml):getTask}
+  createTask: ${file(sls_functions/tasks.yml):createTask}
+  updateTask: ${file(sls_functions/tasks.yml):updateTask}
+  deleteTask: ${file(sls_functions/tasks.yml):deleteTask}
+  signupUser: ${file(sls_functions/cognito.yml):signupUser}
+  loginUser: ${file(sls_functions/cognito.yml):loginUser}
+  privateAPI: ${file(sls_functions/cognito.yml):privateAPI}
+  uploadFile:
+    handler: ${self:custom.folderEndpoints}/uploadFile.handler
     events:
       - http:
-          path: user/signup
+          path: files
           method: post
           cors: true
-  loginUser:
-    handler: ${self:custom.folderEndpoints}/login.handler
-    events:
-      - http:
-          path: user/login
-          method: post
-          cors: true
-  privateAPI:
-    handler: ${self:custom.folderEndpoints}/private.handler
-    events:
-      - http:
-          path: user/private
-          method: post
-          cors: true
-          authorizer:
-            name: PrivateAuthorizer
-            type: COGNITO_USER_POOLS
-            arn: { Fn::GetAtt: [CognitoUserPool, Arn] }
-            claims:
-              - email
-
-  status:
-    handler: ${self:custom.folderEndpoints}/status.handler
-    events:
-      - httpApi:
-          method: get
-          path: /status
-  getTasks:
-    handler: ${self:custom.folderEndpoints}/getTasks.handler
-    events:
-      - httpApi:
-          method: get
-          path: /tasks
-  getTask:
-    handler: ${self:custom.folderEndpoints}/getTask.handler
-    events:
-      - httpApi:
-          method: get
-          path: /tasks/{id}
-  createTask:
-    handler: ${self:custom.folderEndpoints}/createTask.handler
-    events:
-      - httpApi:
-          method: post
-          path: /tasks
-  updateTask:
-    handler: ${self:custom.folderEndpoints}/updateTask.handler
-    events:
-      - httpApi:
-          method: put
-          path: /tasks/{id}
-  deleteTask:
-    handler: ${self:custom.folderEndpoints}/deleteTask.handler
-    events:
-      - httpApi:
-          method: delete
-          path: /tasks/{id}
 
 resources:
   Resources:
@@ -99,6 +57,7 @@ resources:
     CognitoUserPool: ${file(sls_resources/cognito.yml):CognitoUserPool}
     CognitoUserPoolClient: ${file(sls_resources/cognito.yml):CognitoUserPoolClient}
     ApiGatewayAuthorizer: ${file(sls_resources/cognito.yml):ApiGatewayAuthorizer}
+    BucketUpload: ${file(sls_resources/s3.yml):BucketUpload}
 
 plugins:
   - serverless-webpack

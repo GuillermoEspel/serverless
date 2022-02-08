@@ -1,0 +1,27 @@
+signupUser:
+  handler: ${self:custom.folderEndpoints}/signup.handler
+  events:
+    - http:
+        path: user/signup
+        method: post
+        cors: true
+loginUser:
+  handler: ${self:custom.folderEndpoints}/login.handler
+  events:
+    - http:
+        path: user/login
+        method: post
+        cors: true
+privateAPI:
+  handler: ${self:custom.folderEndpoints}/private.handler
+  events:
+    - http:
+        path: user/private
+        method: post
+        cors: true
+        authorizer:
+          name: PrivateAuthorizer
+          type: COGNITO_USER_POOLS
+          arn: { Fn::GetAtt: [CognitoUserPool, Arn] }
+          claims:
+            - email

@@ -1,0 +1,34 @@
+getTasks:
+  handler: ${self:custom.folderEndpoints}/getTasks.handler
+  name: getTasks
+  description: Get tasks function
+  memorySize: 512
+  timeout: 6
+  events:
+    - httpApi:
+        method: get
+        path: /tasks
+getTask:
+  handler: ${self:custom.folderEndpoints}/getTask.handler
+  events:
+    - httpApi:
+        method: get
+        path: /tasks/{id}
+createTask:
+  handler: ${self:custom.folderEndpoints}/createTask.handler
+  events:
+    - httpApi:
+        method: post
+        path: /tasks
+updateTask:
+  handler: ${self:custom.folderEndpoints}/updateTask.handler
+  events:
+    - httpApi:
+        method: put
+        path: /tasks/{id}
+deleteTask:
+  handler: ${self:custom.folderEndpoints}/deleteTask.handler
+  events:
+    - httpApi:
+        method: delete
+        path: /tasks/{id}

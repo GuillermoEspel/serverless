@@ -1,0 +1,6 @@
+status:
+  handler: ${self:custom.folderEndpoints}/status.handler
+  events:
+    - httpApi:
+        method: get
+        path: /status

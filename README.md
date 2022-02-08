@@ -7,6 +7,7 @@
 - AWS Lambda
 - AWS DynamoDB
 - AWS Cognito
+- AWS S3
 - NodeJS
 - Jest
 
